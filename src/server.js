@@ -1,0 +1,27 @@
+import "dotenv/config"
+import app from "./app.js"
+import sequelize from "./database/connection.js"
+import "./model/user.model.js"
+
+const requiredEnvs = [
+    "PORT",
+    "DB_HOST",
+    "DB_PORT",
+    "DB_NAME",
+    "DB_PASSWORD",
+    "JWT_SECRET",
+    "JWT_EXPIRES_IN",
+    "HASH_SALT_ROUNDS"
+]
+
+for (const env of requiredEnvs) {
+    if (!process.env[env]) throw new Error("Incomplete .env")
+}
+
+const PORT = process.env.PORT
+
+sequelize.sync({ alter: true }).then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`)
+    })
+}).catch(err => console.log(`Internal server error: ${err}`))
