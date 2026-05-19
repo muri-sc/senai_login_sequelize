@@ -53,8 +53,10 @@ async function deleteAccountHandler(req, res) {
 
         const user = await User.findByPk(id)
 
-        await user.destroy()
-        return res.status(204)
+        await user.update({
+            active: false
+        })
+        return res.sendStatus(204)
     } catch (err) {
         return res.status(500).json({ message: "Internal server error" })
     }
