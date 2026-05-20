@@ -41,7 +41,7 @@ async function loginUserHandler(req, res) {
             return res.status(400).json({ message: "Incomplete requisition" })
         }
         const user = await User.findOne({ where: { email } })
-        if (!user) {
+        if (!user || !user.active) {
             return res.status(404).json({ message: "Invalid email or password" })
         }
 
