@@ -14,8 +14,18 @@ async function createUserHandler(req, res) {
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Incomplete requisition" })
         }
-        const userExists = await User.findOne({ where: { email } })
+        const userExists = await User.findOne({ where: { email: email } })
         if (userExists) {
+            if (!userExists.active) {
+                const passwordHash = await bcrypt.hash(password, 10)
+
+                await userExists.update({
+                    active: true,
+                    name: name,
+                    password: passwordHash
+                })
+                return res.status(200).json({ message: "User reactivated" })
+            }
             return res.status(409).json({ message: "User already exists" })
         }
         const passwordHash = await bcrypt.hash(password, 10)
@@ -29,7 +39,7 @@ async function createUserHandler(req, res) {
 
         return res.status(201).json({ message: "Sucessfull registration", data: userResponse })
     } catch (err) {
-        return res.status(500).json({ message: "Internal server error" })
+        return res.status(500).json({ message: "Internal server error", error: err.message })
     }
 }
 
@@ -40,9 +50,9 @@ async function loginUserHandler(req, res) {
         if (!email || !password) {
             return res.status(400).json({ message: "Incomplete requisition" })
         }
-        const user = await User.findOne({ where: { email } })
-        if (!user || !user.active) {
-            return res.status(404).json({ message: "Invalid email or password" })
+        const user = await User.findOne({ where: { email: email, active: true } })
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" })
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password)

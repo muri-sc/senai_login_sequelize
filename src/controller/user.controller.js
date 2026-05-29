@@ -27,7 +27,7 @@ async function updateProfileHandler(req, res) {
             return res.status(400).json({ message: "Incomplete requisition" })
         }
         const userExists = await User.findOne({ where: { email } })
-        if (userExists) {
+        if (userExists && userExists.id !== id) {
             return res.status(409).json({ message: "User already exists" })
         }
         const user = await User.findByPk(id)
