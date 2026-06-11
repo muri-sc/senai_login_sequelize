@@ -32,7 +32,9 @@ async function updateProfileHandler(req, res) {
         }
         const user = await User.findByPk(id)
 
-        const passwordHash = await bcrypt.hash(password, 10)
+        const SALT_ROUNDS = Number(process.env.SALT_ROUNDS)
+
+        const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
         await user.update({
             name: name,
             email: email,

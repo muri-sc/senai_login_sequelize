@@ -10,6 +10,7 @@ const requiredEnvs = [
     "DB_USER",
     "DB_PASSWORD",
     "DB_NAME",
+    "SALT_ROUNDS",
     "JWT_SECRET",
     "JWT_EXPIRES_IN"
 ]
@@ -20,7 +21,7 @@ for (const env of requiredEnvs) {
 
 const PORT = process.env.PORT
 
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync().then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`)
     })

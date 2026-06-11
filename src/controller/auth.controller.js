@@ -14,10 +14,12 @@ async function createUserHandler(req, res) {
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Incomplete requisition" })
         }
+        const SALT_ROUNDS = Number(process.env.SALT_ROUNDS)
+
         const userExists = await User.findOne({ where: { email: email } })
         if (userExists) {
             if (!userExists.active) {
-                const passwordHash = await bcrypt.hash(password, 10)
+                const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
 
                 await userExists.update({
                     active: true,
@@ -28,7 +30,7 @@ async function createUserHandler(req, res) {
             }
             return res.status(409).json({ message: "User already exists" })
         }
-        const passwordHash = await bcrypt.hash(password, 10)
+        const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
         const createdUser = await User.create({
             name: name,
             email: email,
