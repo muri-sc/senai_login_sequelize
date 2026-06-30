@@ -11,9 +11,6 @@ async function createUserHandler(req, res) {
     try {
         const { name, email, password } = req.body
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: "Incomplete requisition" })
-        }
         const SALT_ROUNDS = Number(process.env.SALT_ROUNDS)
 
         const userExists = await User.findOne({ where: { email: email } })
@@ -49,9 +46,6 @@ async function loginUserHandler(req, res) {
     try {
         const { email, password } = req.body
 
-        if (!email || !password) {
-            return res.status(400).json({ message: "Incomplete requisition" })
-        }
         const user = await User.findOne({ where: { email: email, active: true } })
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" })
